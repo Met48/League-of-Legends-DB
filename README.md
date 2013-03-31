@@ -22,7 +22,7 @@ Be aware, this is in very early development. While it's already useful data, mak
 
 ## Overview
 
-Both JSON and YAML are generated; take a look!
+To get started just download an output file from [the output branch](https://github.com/Met48/LoLDB/tree/output). Both JSON and YAML are supported; take a look!
 
 ```yaml
 champions:
@@ -97,9 +97,9 @@ It will load your regular `site-packages` as well, so you don't need to install 
 
 ## Usage
 
-For now, you can just grab the output JSON and YAML files from the output branch.
+For now, you can find generated output on [the output branch](https://github.com/Met48/LoLDB/tree/output).
 
-If you want to generate them from your local install, make sure raflib is in place and that you're created an `archives` directory. Then just run `ipy main.py`.
+You can also generate the most up-to-date version from your local install. Make sure raflib is in place and that the `archives` directory exists. Then just run `ipy main.py`.
 
 It will create `league.json`, `league.part.json`, `league.pickle`, and `league.yaml` for you. Every version will also get copied to `archives`.
 
@@ -108,6 +108,7 @@ It will create `league.json`, `league.part.json`, `league.pickle`, and `league.y
 - Generate information for items, runes
 - Organize data better for iteration
     - Ex. A list of champion ids is really needed
+- Generate data for champion passives
 - Fix missing `tooltip_values`. In particular, damage scaling such as `@f1@`.
 - Fix output for languages that translate character names
 - Extract what each effect actually does using the tooltips
