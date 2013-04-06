@@ -288,7 +288,7 @@ def _unpack_from(buf, format, count=None, little_endian=True):
         return res[0]
 
 
-def read_inibin(buf, font_config, kind='character'):
+def read_inibin(buf, font_config, kind='character', fix_keys=True):
     """
     Read an inibin file.
 
@@ -396,8 +396,9 @@ def read_inibin(buf, font_config, kind='character'):
         raise RuntimeError("%i bytes remaining!" % len(remaining))
 
     # Convert the mapping to be more human-readable
-    assert kind in KEY_MAPPING
-    mapping = _fix_keys(KEY_MAPPING[kind], mapping, font_config)
+    if fix_keys:
+        assert kind in KEY_MAPPING
+        mapping = _fix_keys(KEY_MAPPING[kind], mapping, font_config)
 
     return mapping
 
@@ -405,8 +406,14 @@ def read_inibin(buf, font_config, kind='character'):
 if __name__ == '__main__':
     from pprint import pprint
     import sys
-    assert len(sys.argv) == 2
-    with open(sys.argv[1], 'rb') as f:
+    assert len(sys.argv) in (2, 3)
+    with open(sys.argv[-1], 'rb') as f:
         data = f.read()
-    mapping = read_inibin(data)
+    if len(sys.argv) == 3:
+        fix_keys = True
+        kind = sys.argv[1]
+    else:
+        fix_keys = False
+        kind = None
+    mapping = read_inibin(data, {}, kind, fix_keys)
     pprint(mapping)
