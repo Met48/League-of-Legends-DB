@@ -14,6 +14,7 @@ __ALL__ = ['read_inibin']
 
 
 MULT_5 = lambda x: x * 5
+PERCENTAGE = lambda x: float(x * 10) if isinstance(x, int) else x * 100
 
 KEY_MAPPING = {
     # Inibins use numeric keys - this maps the keys to human-readable names
@@ -132,22 +133,19 @@ KEY_MAPPING = {
         },
         'effect5': {
             # @Effect5Amount@
-            # TODO: Finish
-            'WARNING': 'NOT IMPLEMENTED',
-            # 'level1': None, # 1229951523 or 1307804625?
+            'level1': 1307804625,
             'level2': 605975122,
             'level3': -95854381,
             'level4': -797683884,
-            # 'level5': # -1499513387 or 466816973?
+            'level5': -1499513387
         },
         'effect6': {
             # TODO: Finish
             'WARNING': 'NOT IMPLEMENTED'
         },
-        'scale1': 844968125,  # @CharAbilityPower@
-        'scale2': -1783890251,  # @CharAbilityPower2@
+        'scale1': (844968125, PERCENTAGE),  # @CharAbilityPower@ and @CharBonusPhysical@
+        'scale2': (-1783890251, PERCENTAGE),  # @CharAbilityPower2@ and @CharBonusPhysical2@
         # There is no scale3 / 4
-        # TODO: Damage scaling?
         'cooldown': {
             # @Cooldown@
             'level1': -1665665330,

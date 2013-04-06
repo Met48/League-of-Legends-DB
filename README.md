@@ -109,12 +109,11 @@ It will create `league.json`, `league.part.json`, `league.pickle`, and `league.y
 - Organize data better for iteration
     - Ex. A list of champion ids is really needed
 - Generate data for champion passives
-- Fix missing `tooltip_values`. In particular, damage scaling such as `@f1@`.
+- Fix missing `tooltip_values`. In particular, values of the form `@f1@`.
 - Fix output for languages that translate character names
 - Extract what each effect actually does using the tooltips
     - This is already WIP, see `parse_tooltip.py`
-- Fix `@Effect5Amount@` and `@Effect6Amount@`
-    - These values aren't extracted yet, breaking some tooltips (ex. Elise R)
+- Fix `@Effect6Amount@` - this only affects Quinn
 - Fix rounding of `aspd`, `tooltip_values`
 - Generate a more efficient version, for web use
 
