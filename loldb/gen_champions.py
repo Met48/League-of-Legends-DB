@@ -1,7 +1,7 @@
 """League champion data generator."""
 
-from collections import namedtuple
 import re
+from util import get_sql_rows
 
 
 def get_champions_map(connection):
@@ -9,17 +9,8 @@ def get_champions_map(connection):
 
     champions_map = {}
 
-    cursor = connection.cursor()
-    rows = cursor.execute("SELECT * FROM `champions`")
-
-    # Get column names from cursor
-    columns = [c[0] for c in cursor.description]
-    ChampionRow = namedtuple('ChampionRow', columns)
-
     # Process database rows
-    for row in rows:
-        row = ChampionRow(*row)
-
+    for row in get_sql_rows(connection, 'champions'):
         # Helper functions
         def get_tips(string):
             return [tip for tip in string.split('*') if tip]

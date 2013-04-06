@@ -1,5 +1,5 @@
-from collections import namedtuple
 import re
+from util import get_sql_rows
 
 
 def get_skins_map(connection):
@@ -7,16 +7,7 @@ def get_skins_map(connection):
 
     skins_map = {}
 
-    cursor = connection.cursor()
-    rows = cursor.execute("SELECT * FROM `championSkins`")
-
-    # Get column names from cursor
-    columns = [c[0] for c in cursor.description]
-    ChampionSkinRow = namedtuple('ChampionSkinRow', columns)
-
-    for row in rows:
-        row = ChampionSkinRow(*row)
-
+    for row in get_sql_rows(connection, 'championSkins'):
         skin = {
             'id': row.id,
             'name': row.displayName,

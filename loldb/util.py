@@ -12,6 +12,20 @@ def get_answer():
             return answer == 'y'
 
 
+def get_sql_rows(connection, table):
+    cursor = connection.cursor()
+    # execute doesn't accept a parameterized table name
+    rows = cursor.execute("SELECT * FROM `%s`" % table)
+
+    # Get column names from cursor
+    columns = [c[0] for c in cursor.description]
+    Row = collections.namedtuple('Row', columns)
+
+    for row in rows:
+        row = Row(*row)
+        yield row
+
+
 # Processing dictionaries
 
 def merge(*mappings):
