@@ -27,19 +27,23 @@ def fix(league):
 
             # The per-level values for the effects
             new_ability['tooltip_values'] = {}
+
+            def set_tooltip_value(key, value):
+                if key not in tooltip:
+                    return
+                new_ability['tooltip_values'][key] = value
+
             for i in range(1, 6):  # 7):
                 # TODO: Fix for effect 6
-                if ('@Effect%dAmount@' % i) not in tooltip:
-                    continue
                 amounts = raw['effect%d' % i]
                 amounts = [amounts[x] for x in levels]
-                new_ability['tooltip_values']['@Effect%dAmount@' % i] = amounts
+                set_tooltip_value('@Effect%dAmount@' % i, amounts)
 
             # Scaling
-            new_ability['tooltip_values']['@CharAbilityPower@'] = raw['scale1']
-            new_ability['tooltip_values']['@CharBonusPhysical@'] = raw['scale1']
-            new_ability['tooltip_values']['@CharAbilityPower2@'] = raw['scale2']
-            new_ability['tooltip_values']['@CharBonusPhysical2@'] = raw['scale2']
+            set_tooltip_value('@CharAbilityPower@', raw['scale1'])
+            set_tooltip_value('@CharBonusPhysical@', raw['scale1'])
+            set_tooltip_value('@CharAbilityPower2@', raw['scale2'])
+            set_tooltip_value('@CharBonusPhysical2@', raw['scale2'])
 
             # Misc
             new_ability['name'] = raw['name']

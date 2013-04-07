@@ -67,7 +67,8 @@ def get_items_map(connection):
             print "ERROR: Missing recipe result, item id", row.buildsToItemId
             continue
         if row.recipeItemId not in items_map:
-            print "ERROR: Missing recipe component, item id", row.recipeItemId
+            print ("ERROR: Missing recipe component for %s, component id %d." %
+                   (row.buildsToItemId, row.recipeItemId))
             continue
         item = items_map[row.buildsToItemId]
         item['recipe'].append(row.recipeItemId)
