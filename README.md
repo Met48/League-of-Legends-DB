@@ -24,7 +24,7 @@ This is still in early development, so make sure to check out the Todo before us
 
 ## Overview
 
-To get started just download a file from [the output branch](https://github.com/Met48/LoLDB/tree/output). Both JSON and YAML are supported; take a look!
+To get started just download a file from [the output branch](https://github.com/Met48/League-of-Legends-DB/tree/output). Both JSON and YAML are supported; take a look!
 
 ```yaml
 champions:
@@ -120,7 +120,7 @@ It will load your regular `site-packages` as well, so you don't need to install 
 
 ## Usage
 
-For now, you can find generated output on [the output branch](https://github.com/Met48/LoLDB/tree/output).
+For now, you can find generated output on [the output branch](https://github.com/Met48/League-of-Legends-DB/tree/output).
 
 You can also generate the most up-to-date version from your local install. Make sure raflib is in place and that the `archives` directory exists. Then just run `ipy main.py`.
 
