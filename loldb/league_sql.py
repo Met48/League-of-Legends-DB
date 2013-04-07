@@ -1,6 +1,7 @@
 import sqlite3
 
 import gen_champions
+import gen_items
 import gen_skins
 
 
@@ -25,5 +26,11 @@ def generate(db_path, corrections_map):
 
     merge_skins(skins_map, champions_map)
 
-    return {'champions': champions_map}
+    items_map = gen_items.get_items_map(connection)
+    gen_items.correct_items_map(items_map, corrections_map)
+
+    return {
+        'champions': champions_map,
+        'items': items_map
+    }
 

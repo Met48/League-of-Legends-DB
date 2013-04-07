@@ -3,6 +3,8 @@
 Easy-to-use League of Legends data.
 
 ```javascript
+> items.recurve_bow.stats.aspd
+{ flat: 0, percentage: 30 }
 > champions.caitlyn.stats.dmg
 { base: 47, per_level: 3 }
 > champions.wukong.internal_name
@@ -16,13 +18,13 @@ Easy-to-use League of Legends data.
   id: 133001 }
 ```
 
-## WIP Warning!
+## WIP!
 
-Be aware, this is in very early development. While it's already useful data, make sure to check out the Todo below.
+This is still in early development, so make sure to check out the Todo before using.
 
 ## Overview
 
-To get started just download an output file from [the output branch](https://github.com/Met48/LoLDB/tree/output). Both JSON and YAML are supported; take a look!
+To get started just download a file from [the output branch](https://github.com/Met48/LoLDB/tree/output). Both JSON and YAML are supported; take a look!
 
 ```yaml
 champions:
@@ -38,7 +40,8 @@ champions:
       tooltip_values:
         '@CharAbilityPower@': 0.32499998807907104
         '@Effect1Amount@': [40.0, 65.0, 90.0, 115.0, 140.0]
-    - ...
+        # ...
+    # ...
     icon: Ahri_Square_0.png
     id: 103
     internal_name: Ahri
@@ -81,6 +84,26 @@ champions:
           and Fox-Fire dramatically easier.', ...]
     title: the Nine-Tailed Fox
   ahri: *id556
+  # ...
+items:
+  3128: &id697
+    categories: {active: true, cooldown_reduction: true, spell_damage: true}
+    cost: 680
+    icon: 055_Borses_Staff_of_Apocalypse.png
+    id: 3128
+    name: Deathfire Grasp
+    recipe: [1058, 3108]
+    stats:
+      ad: {flat: 0.0, percentage: 0.0}
+      ap: {flat: 120.0, percentage: 0.0}
+      # ...
+    tier: 2
+    tooltip: <stats>+120 Ability Power<br>+10% Cooldown Reduction</stats><br><br><active>UNIQUE
+      Active:</active> Deals 15% of target champion's maximum Health in magic damage
+      and increases all subsequent magic damage taken by the target by 20% for 4 seconds
+      (60 second cooldown).
+  deathfire_grasp: *id697
+  # ...
 ```
 
 It's almost completely automatic; running it on most patches won't need any user input, making it easy to keep up-to-date.
@@ -105,18 +128,32 @@ It will create `league.json`, `league.part.json`, `league.pickle`, and `league.y
 
 ## Todo
 
-- Generate information for items, runes
-- Organize data better for iteration
-    - Ex. A list of champion ids is really needed
-- Generate data for champion passives
-- Fix missing `tooltip_values`. In particular, values of the form `@f1@`.
-- Fix output for languages that translate character names
-- Extract what each effect actually does using the tooltips
-    - This is already WIP, see `parse_tooltip.py`
-- Fix `@Effect6Amount@` - this only affects Quinn
+- Fix errors in `tooltip_values`
+  - Fix `@f1@`, `@f2@`, etc.
+  - Fix `@Effect6Amount@` - this only affects Quinn
 - Fix rounding of `aspd`, `tooltip_values`
-- Generate a more efficient version, for web use
+- Fix output for languages that translate character names
+- Fix ability costs that aren't mana
+- Fix Rumble's abilities
 
-## Data Sources
+--
 
-It gets all of its data from the local game installation, assumed to be on `C:\`. All of the skin information, as well as most of the champion information, is from `gameStats_en_US.sqlite` (other languages are supported too). All of the abilities and stats are extracted from inibin files stored in raf archives, with strings from `fontconfig_en_US.txt`.
+- Generate data for champion passives
+- Generate information for runes
+- Organize data better for iteration
+  - Ex. A list of champion ids is really needed
+- Extract what each effect actually does using the tooltips
+  - This is WIP, see `parse_tooltip.py`
+- Generate an efficient, web-friendly version
+  - Current size of `league.part.json` is 900 KB
+
+## Sources
+
+Data is gathered from the local game installation, assumed to be on `C:\`.
+
+- Champions
+  - Basic data, skins: `gameStats_en_US.sqlite`
+  - Stats, abilities: RAF archives, `fontconfig_en_US.txt`
+- Items: `gameStats_en_US.sqlite`
+
+Data for other languages can be generated as well.
