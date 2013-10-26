@@ -1,7 +1,4 @@
 # Quick hack
-import sys
-sys.path.append('C:/Python27/lib/site-packages')
-
 from copy import deepcopy
 import json
 import os
