@@ -1,7 +1,7 @@
 """League item data generator."""
 
 import re
-from util import get_sql_rows
+from .util import get_sql_rows
 
 
 def get_items_map(connection):

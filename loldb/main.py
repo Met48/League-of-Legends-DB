@@ -6,11 +6,11 @@ import pickle
 
 import yaml
 
-from file_transactions import FileTransaction
-import league_sql
-import league_raf
-import league_ability
-import util
+from .file_transactions import FileTransaction
+from . import league_sql
+from . import league_raf
+from . import league_ability
+from . import util
 
 
 def get_db_path(base_path, language='en_US'):
@@ -18,7 +18,7 @@ def get_db_path(base_path, language='en_US'):
 
     return os.path.join(
         util.build_path(base_path),
-        "deploy/assets/data/gameStats",
+        "deploy/bin/assets/data/gameStats",  # TODO: Is /bin used on Windows?
         'gameStats_%s.sqlite' % language,
     )
 
@@ -119,12 +119,3 @@ def main(
 
         # Write changes
         transaction.complete()
-
-
-if __name__ == '__main__':
-    main(
-        corrections_path='corrections.json',
-        base_path="C:/Riot Games/League of Legends",
-        output_name='league',
-        archives_path='archive',
-    )

@@ -1,8 +1,8 @@
 import sqlite3
 
-import gen_champions
-import gen_items
-import gen_skins
+from . import gen_champions
+from . import gen_items
+from . import gen_skins
 
 
 def merge_skins(skins_map, champions_map):

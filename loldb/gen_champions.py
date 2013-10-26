@@ -1,7 +1,7 @@
 """League champion data generator."""
 
 import re
-from util import get_sql_rows
+from .util import get_sql_rows
 
 
 def get_champions_map(connection):

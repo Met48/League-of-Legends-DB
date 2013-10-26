@@ -1,5 +1,5 @@
 import re
-from util import get_sql_rows
+from .util import get_sql_rows
 
 
 def get_skins_map(connection):

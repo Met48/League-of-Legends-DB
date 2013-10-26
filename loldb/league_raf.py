@@ -3,6 +3,7 @@ import re
 
 from raf import RAFMaster
 from inibin import Inibin
+
 from .util import get_highest_version
 
 
