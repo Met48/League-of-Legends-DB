@@ -1,12 +1,9 @@
 # Must run with IronPython
-import clr
 import re
 
-clr.AddReferenceToFileAndPath("../raflib/RAFlibPlus")
-import RAFlibPlus
-
-from inibin import read_inibin
-from util import get_highest_version
+from raf import RAFMaster
+from inibin import Inibin
+from .util import get_highest_version
 
 
 def load_fontconfig(fontconfig_path):
@@ -21,8 +18,8 @@ def load_fontconfig(fontconfig_path):
 def find_inibins(raf_path, pattern):
     """Generator of raf files that match a pattern."""
 
-    raflib = RAFlibPlus.RAFMasterFileList(raf_path)
-    all_rafs = raflib.FileDictFull
+    rafmaster = RAFMaster(raf_path)
+    all_rafs = rafmaster.FileDictFull
     keys = dict(all_rafs).iterkeys()
 
     for key in keys:
@@ -51,8 +48,7 @@ def find_inibins(raf_path, pattern):
 
 def map_champion_data(inibins, font_config):
     for internal_name, data in inibins:
-        # TODO: Make using IniBinReader better
-        mapping = read_inibin(data, font_config)
+        mapping = Inibin(data).as_champion(font_config)
         yield internal_name, mapping
 
 
@@ -91,7 +87,7 @@ def generate(league, raf_path, fontconfig_path, corrections):
             if name in ability_inibins:
                 # Parse ability
                 try:
-                    ability = read_inibin(ability_inibins[name], font_config, 'ability')
+                    ability = Inibin(ability_inibins[name]).as_ability(font_config)
                 except RuntimeError:
                     # TODO: Handle this (probably by updating pyinibin_parser)
                     pass
