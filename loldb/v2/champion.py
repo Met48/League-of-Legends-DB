@@ -30,11 +30,31 @@ class Stats(object):
     mana = Stat(0, 0)
     mp5 = Stat(0, 0)
     damage = Stat(0, 0)
-    sttack_speed = Stat(0, 0)
+    attack_speed = Stat(0, 0)
     armor = Stat(0, 0)
     magic_resist = Stat(0, 0)
     range = 0
     speed = 0
+
+    # TODO: These methods are specific to champion inibins, should they be here?
+    @staticmethod
+    def _create_stat(inibin_map, key):
+        """Read base and per_level values from inibin map."""
+        stat = inibin_map['stats'][key]
+        return Stat(stat['base'], stat['per_level'])
+
+    def update_from_inibin(self, inibin_map):
+        # TODO: Better error checking
+        self.hp = self._create_stat(inibin_map, 'hp')
+        self.hp5 = self._create_stat(inibin_map, 'hp5')
+        self.mana = self._create_stat(inibin_map, 'mana')
+        self.mp5 = self._create_stat(inibin_map, 'mp5')
+        self.range = inibin_map['stats']['range']
+        self.damage = self._create_stat(inibin_map, 'dmg')
+        self.attack_speed = self._create_stat(inibin_map, 'aspd')
+        self.armor = self._create_stat(inibin_map, 'armor')
+        self.magic_resist = self._create_stat(inibin_map, 'mr')
+        self.speed = inibin_map['stats']['speed']
 
 
 class Champion(object):
@@ -92,12 +112,6 @@ def _get_description(desc):
     return desc.replace("''", '"')
 
 
-def _create_stat(inibin_map, key):
-    """Return a Stat instance with base and per_level values within inibin key."""
-    stat = inibin_map['stats'][key]
-    return Stat(stat['base'], stat['per_level'])
-
-
 def get_champions(provider):
     for row in provider.get_db_rows('champions'):
         # TODO: videos?
@@ -152,19 +166,7 @@ def get_champions(provider):
         else:
             inibin_map = inibin_map.as_champion(provider.get_font_config())
             # Read stats
-            # TODO: Better error checking
-            # TODO: Refactor
-            stats = champion.stats
-            stats.hp = _create_stat(inibin_map, 'hp')
-            stats.hp5 = _create_stat(inibin_map, 'hp5')
-            stats.mana = _create_stat(inibin_map, 'mana')
-            stats.mp5 = _create_stat(inibin_map, 'mp5')
-            stats.range = inibin_map['stats']['range']
-            stats.damage = _create_stat(inibin_map, 'dmg')
-            stats.attack_speed = _create_stat(inibin_map, 'aspd')
-            stats.armor = _create_stat(inibin_map, 'armor')
-            stats.magic_resist = _create_stat(inibin_map, 'mr')
-            stats.speed = inibin_map['stats']['speed']
+            champion.stats.update_from_inibin(inibin_map)
 
             # Find abilities
             # TODO
