@@ -46,6 +46,9 @@ class Ability(object):
     def __init__(self):
         self.levels = []
 
+    def __repr__(self):
+        return '<Ability \'{}\'>'.format(self.name)
+
     @staticmethod
     def format_tooltip(tooltip):
         """Convert tooltip html to text."""
