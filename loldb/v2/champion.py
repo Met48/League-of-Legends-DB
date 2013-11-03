@@ -1,6 +1,9 @@
 import collections
 import re
-import inibin
+
+from inibin import Inibin
+
+from .ability import Ability
 
 
 class Lore(object):
@@ -74,7 +77,7 @@ class Champion(object):
     tips_as = []
     tips_against = []
     tags = set()
-    abilities = {}
+    abilities = []
 
     def __init__(self, internal_name):
         self.internal_name = internal_name
@@ -84,7 +87,7 @@ class Champion(object):
         self.tips_as = []
         self.tips_against = []
         self.tags = set()
-        self.abilities = {}
+        self.abilities = []
 
     def add_tip_as(self, tip):
         self.tips_as.append(tip.strip())
@@ -100,6 +103,12 @@ class Champion(object):
         # name = re.sub('^[0-9]', '', name)
         return name
 
+    def __lt__(self, other):
+        return self.id < other.id
+
+    def __repr__(self):
+        return '<Champion {} \'{}\'>'.format(self.id, self.name)
+
 
 def _get_tips(tips_str):
     """Get list of tips from tips string."""
@@ -110,6 +119,23 @@ def _get_description(desc):
     """Format description text."""
     # Description often contains '' instead of "
     return desc.replace("''", '"')
+
+
+def _find_inibin(provider, pattern):
+    raf_master = provider.get_raf_master()
+    raf_results = list(raf_master.find_re(pattern))
+    if not raf_results:
+        print('No inibin for %s' % pattern)
+    if len(raf_results) > 1:
+        # TODO: Is this ever triggered?
+        print('Ambiguous inibin for %s' % pattern)
+    try:
+        inibin = Inibin(data=raf_results[0].read())
+    except Exception:  # TODO: Less generic Exception
+        print('Malformed inibin for %s' % pattern)
+        return None
+    else:
+        return inibin
 
 
 def get_champions(provider):
@@ -151,28 +177,26 @@ def get_champions(provider):
         champion.alias = alias
 
         # Find champion inibin
-        raf_master = provider.get_raf_master()
-        raf_pattern = '^data/characters/{0}/{0}.inibin$'.format(champion.internal_name.lower())
-        raf_results = list(raf_master.find_re(raf_pattern))
-        if not raf_results:
-            print('No champion inibin for %s' % champion.internal_name)
-        if len(raf_results) > 1:
-            # TODO: Is this ever triggered?
-            print('Ambiguous champion inibin for %s' % champion.internal_name)
-        try:
-            inibin_map = inibin.Inibin(data=raf_results[0].read())
-        except Exception:  # TODO: Less generic Exception
-            print('Malformed champion inibin for %s' % champion.internal_name)
-        else:
-            inibin_map = inibin_map.as_champion(provider.get_font_config())
+        champ_name = champion.internal_name.lower()
+        champ_pattern = '^data/characters/{0}/{0}.inibin$'.format(champ_name)
+        champ_inibin = _find_inibin(provider, champ_pattern)
+        if champ_inibin is not None:
+            font_config = provider.get_font_config()
+            champ_inibin = champ_inibin.as_champion(font_config)
             # Read stats
-            champion.stats.update_from_inibin(inibin_map)
+            champion.stats.update_from_inibin(champ_inibin)
 
             # Find abilities
-            # TODO
-            abilities = inibin_map['abilities']
+            abilities = champ_inibin['abilities']
             ability_keys = ['skill%d' % i for i in range(1, 5)]
             abilities = [abilities[key] for key in ability_keys]
-            print(abilities)
+            for i, ability_name in enumerate(abilities):
+                ability_pattern = r"^data/(?:characters/{0}/)?spells/{1}.inibin$".format(champ_name, ability_name)
+                ability_inibin = _find_inibin(provider, ability_pattern)
+                if ability_inibin is None:
+                    continue
+                ability_inibin = ability_inibin.as_ability(font_config)
+                ability = Ability.from_inibin(ability_inibin, i)
+                champion.abilities.append(ability)
 
         yield champion
