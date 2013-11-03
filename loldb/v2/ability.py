@@ -9,12 +9,30 @@ class AbilityLevel(object):
     def __init__(self):
         self.tooltip_values = {}
 
-    def set_scales(self, scale1, scale2):
+    def set_tooltip_value(self, key, value, tooltip=None):
+        """
+        Sets a tooltip value.
+
+        If tooltip is provided, the key will only be
+        set if it is present within the tooltip.
+
+        """
+        if tooltip is None or key in tooltip:
+            self.tooltip_values[key] = value
+
+    def set_scales(self, scale1, scale2, tooltip=None):
         # TODO: Refactor?
-        self.tooltip_values['@CharAbilityPower1@'] = scale1
-        self.tooltip_values['@CharBonusPhysical1@'] = scale1
-        self.tooltip_values['@CharAbilityPower2@'] = scale2
-        self.tooltip_values['@CharBonusPhysical2@'] = scale2
+        self.set_tooltip_value('@CharAbilityPower@', scale1, tooltip)
+        self.set_tooltip_value('@CharBonusPhysical@', scale1, tooltip)
+        self.set_tooltip_value('@CharAbilityPower2@', scale2, tooltip)
+        self.set_tooltip_value('@CharBonusPhysical2@', scale2, tooltip)
+
+    def __repr__(self):
+        return '<AbilityLevel cost={} cooldown={} tooltip_values={}>'.format(
+            self.cost,
+            self.cooldown,
+            self.tooltip_values
+        )
 
 
 class Ability(object):
@@ -70,7 +88,7 @@ class Ability(object):
         ability.name = inibin['name']
         ability.description = inibin['desc']
         ability.key = cls.KEYS[key]
-        ability.tooltip = Ability.format_tooltip(inibin['tooltip'])
+        ability.tooltip = tooltip = Ability.format_tooltip(inibin['tooltip'])
 
         # Extract effect amounts for all levels
         effect_amounts = []
@@ -91,7 +109,7 @@ class Ability(object):
             # Set ability scale amounts
             # These are constant across all levels
             # TODO: Refactor
-            level.set_scales(inibin['scale1'], inibin['scale2'])
+            level.set_scales(inibin['scale1'], inibin['scale2'], tooltip)
 
             # Get level-specific values
             level.cooldown = cooldowns[i]
@@ -101,7 +119,11 @@ class Ability(object):
             for j in range(5):
                 # TODO: Reduce duplication with earlier effect extraction
                 effect_amount = effect_amounts[j][i]
-                level.tooltip_values['@Effect%dAmount@' % (j + 1)] = effect_amount
+                level.set_tooltip_value(
+                    '@Effect%dAmount@' % (j + 1),
+                    effect_amount,
+                    tooltip
+                )
 
             ability.levels.append(level)
 
