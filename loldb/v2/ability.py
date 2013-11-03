@@ -33,8 +33,11 @@ class Ability(object):
         """Convert tooltip html to text."""
         tooltip = tooltip.replace('<br>', '\n')
         tooltip = Soup(tooltip)
-        tooltip = tooltip.maintext.text
-        return tooltip
+        maintext = tooltip.maintext
+        if maintext is None:
+            return None
+        else:
+            return maintext.text
 
     KEYS = 'QWER'
     # TODO: Level 6 support
@@ -59,7 +62,7 @@ class Ability(object):
 
         """
         is_ult = key == 3
-        levels = cls.LEVELS[:4 if is_ult else 6]
+        levels = cls.LEVELS[:4 if is_ult else 5]  # 6]
 
         ability = cls()
 
@@ -95,7 +98,11 @@ class Ability(object):
             level.cost = costs[i]
 
             # TODO: Refactor this loop
-            for j in range(1, 6):
+            for j in range(5):
                 # TODO: Reduce duplication with earlier effect extraction
                 effect_amount = effect_amounts[j][i]
-                level.tooltip_values['@Effect%dAmount@' % j] = effect_amount
+                level.tooltip_values['@Effect%dAmount@' % (j + 1)] = effect_amount
+
+            ability.levels.append(level)
+
+        return ability
