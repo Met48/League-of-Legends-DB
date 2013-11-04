@@ -17,12 +17,35 @@ class Lore(object):
         self.quote = quote
         self.quote_author = quote_author
 
+    @staticmethod
+    def _correct_description(desc):
+        """
+        Correct errors in description text.
+
+        Descriptions often contain two single
+        quotes ('') instead of one double quote (").
+
+        """
+        return desc.replace("''", '"')
+
+    def update_from_sql_row(self, row):
+        self.body = self._correct_description(row.description)
+        self.quote = row.quote
+        self.quote_author = row.quoteAuthor
+
+
 
 class Ratings(object):
     attack = 0
     defense = 0
     magic = 0
     difficulty = 0
+
+    def update_from_sql_row(self, row):
+        self.attack = row.ratingAttack
+        self.defense = row.ratingDefense
+        self.magic = row.ratingMagic
+        self.difficulty = row.ratingDifficulty
 
 
 ChampionStat = collections.namedtuple('ChampionStat', 'base per_level')
@@ -79,6 +102,7 @@ class Champion(object):
     tips_against = []
     tags = set()
     abilities = []
+    skins = []
 
     def __init__(self, internal_name):
         self.internal_name = internal_name
@@ -89,20 +113,7 @@ class Champion(object):
         self.tips_against = []
         self.tags = set()
         self.abilities = []
-
-    def add_tip_as(self, tip):
-        self.tips_as.append(tip.strip())
-
-    def add_tip_against(self, tip):
-        self.tips_against.append(tip.strip())
-
-    @property
-    def friendly_name(self):
-        name = self.name
-        name = name.lower()
-        name = re.sub('[^a-z0-9]+', '_', name)
-        # name = re.sub('^[0-9]', '', name)
-        return name
+        self.skins = []
 
     def __lt__(self, other):
         return self.id < other.id
@@ -113,13 +124,7 @@ class Champion(object):
 
 def _get_tips(tips_str):
     """Get list of tips from tips string."""
-    return [tip for tip in tips_str.split('*') if tip]
-
-
-def _get_description(desc):
-    """Format description text."""
-    # Description often contains '' instead of "
-    return desc.replace("''", '"')
+    return [tip.strip() for tip in tips_str.split('*') if tip]
 
 
 def _find_inibin(provider, pattern):
@@ -149,29 +154,17 @@ def get_champions(provider):
         champion.name = row.displayName
 
         # Misc
+        champion.alias = alias(row.displayName)
         champion.title = row.title
         champion.id = row.id
         champion.icon_path = row.iconPath
         champion.tags = set(row.tags.split(','))
-
-        # Lore
-        champion.lore.body = _get_description(row.description)
-        champion.lore.quote = row.quote
-        champion.lore.quote_author = row.quoteAuthor
-
-        # Ratings
-        champion.ratings.attack = row.ratingAttack
-        champion.ratings.defense = row.ratingDefense
-        champion.ratings.magic = row.ratingMagic
-        champion.ratings.difficulty = row.ratingDifficulty
+        champion.lore.update_from_sql_row(row)
+        champion.ratings.update_from_sql_row(row)
 
         # Tips
-        tips_as = _get_tips(row.tips)
-        tips_against = _get_tips(row.opponentTips)
-        map(champion.add_tip_as, tips_as)
-        map(champion.add_tip_against, tips_against)
-
-        champion.alias = alias(row.displayName)
+        champion.tips_as = _get_tips(row.tips)
+        champion.tips_against = _get_tips(row.opponentTips)
 
         # Find champion inibin
         champ_name = champion.internal_name.lower()
