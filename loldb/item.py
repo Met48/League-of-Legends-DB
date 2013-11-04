@@ -43,7 +43,8 @@ class ItemStats(object):
             percentage = row['percent%sMod' % key]
             if name.endswith('p5'):
                 flat *= 5
-                percentage *= 5
+                # TODO: Should percentage be multiplied?
+                # percentage *= 5
             stat = ItemStat(flat, percentage)
             assert hasattr(self, name)
             setattr(self, name, stat)
