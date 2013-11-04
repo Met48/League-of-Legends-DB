@@ -82,6 +82,25 @@ class ChampionStats(object):
         self.magic_resist = self._create_stat(inibin_map, 'mr')
         self.speed = inibin_map['stats']['speed']
 
+    _STATS = (
+        'hp',
+        'hp5',
+        'mana',
+        'mp5',
+        'damage',
+        'attack_speed',
+        'armor',
+        'magic_resist',
+        'range',
+        'speed',
+    )
+
+    def __repr__(self):
+        return '<ChampionStats %s>' % ' '.join(
+            '%s=%s' % (key, getattr(self, key))
+            for key in self._STATS
+        )
+
 
 class Champion(object):
     id = -1
