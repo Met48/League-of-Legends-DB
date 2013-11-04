@@ -4,6 +4,7 @@ import warnings
 from inibin import Inibin
 
 from .ability import Ability
+from .skin import get_skins_for_champion
 from .util import alias
 
 
@@ -103,6 +104,27 @@ class ChampionStats(object):
 
 
 class Champion(object):
+    """
+    Represents a champion.
+
+    Instance variables:
+    id: unique integer id for the champion
+    internal_name: unique string id for the champion
+    name: string name of the champion
+    alias: string name usable as a variable name
+    title: string title of the champion
+    icon_path: string name of the champion icon file
+    select_sound_path
+    stats: ChampionStats instance
+    lore: Lore instance
+    ratings: Ratings instance
+    tips_as: List of string tips for players of champion
+    tips_against: List of string tips for players against champion
+    tags: Set of string tags categorizing champion
+    abilities: List of Ability instances
+    skins: List of Skin instances
+
+    """
     id = -1
 
     internal_name = ''
@@ -112,15 +134,6 @@ class Champion(object):
 
     icon_path = ''
     select_sound_path = ''
-
-    stats = None
-    lore = None
-    ratings = None
-    tips_as = []
-    tips_against = []
-    tags = set()
-    abilities = []
-    skins = []
 
     def __init__(self, internal_name):
         self.internal_name = internal_name
@@ -161,7 +174,7 @@ def _get_tips_from_string(tips_str):
     return [tip.strip() for tip in tips_str.split('*') if tip]
 
 
-def _get_raw_champion_from_provider_and_sql_row(provider, row):
+def _get_raw_champion_from_sql_row(row):
     """
     Create a Champion using a row from the champions table in the database.
 
@@ -188,8 +201,6 @@ def _get_raw_champion_from_provider_and_sql_row(provider, row):
     champion.tips_as = _get_tips_from_string(row.tips)
     champion.tips_against = _get_tips_from_string(row.opponentTips)
 
-    _update_raw_champion_with_provider(champion, provider)
-
     return champion
 
 
@@ -213,6 +224,9 @@ def _update_raw_champion_with_provider(champion, provider):
 
     # Find abilities
     _update_champion_abilities(provider, champion, champ_inibin['abilities'])
+
+    # Find skins
+    _update_champion_skins(provider, champion)
 
 
 _ABILITY_KEYS = list('skill%d' % i for i in range(1, 5))
@@ -251,6 +265,14 @@ def _find_ability_inibin(provider, champion, ability_name):
     return ability_inibin
 
 
+def _update_champion_skins(provider, champion):
+    skins = get_skins_for_champion(provider, champion.id)
+    skins = sorted(list(skins))
+    champion.skins = skins
+
+
 def get_champions(provider):
     for row in provider.get_db_rows('champions'):
-        yield _get_raw_champion_from_provider_and_sql_row(provider, row)
+        champion = _get_raw_champion_from_sql_row(row)
+        _update_raw_champion_with_provider(champion, provider)
+        yield champion

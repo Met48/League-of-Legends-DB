@@ -127,7 +127,8 @@ def _set_item_recipes(provider, items):
                           row.buildsToItemId)
             continue
         if row.recipeItemId not in items:
-            warnings.warn('Missing recipe component id %s' % row.recipeItemId)
+            warnings.warn('Missing recipe component id %s for item id %s' %
+                          (row.recipeItemId, row.buildsToItemId))
             continue
         item = items[row.buildsToItemId]
         item.recipe.add(row.recipeItemId)
