@@ -4,6 +4,7 @@ import re
 from inibin import Inibin
 
 from .ability import Ability
+from .util import alias
 
 
 class Lore(object):
@@ -24,18 +25,18 @@ class Ratings(object):
     difficulty = 0
 
 
-Stat = collections.namedtuple('Stat', 'base per_level')
+ChampionStat = collections.namedtuple('ChampionStat', 'base per_level')
 
 
-class Stats(object):
-    hp = Stat(0, 0)
-    hp5 = Stat(0, 0)
-    mana = Stat(0, 0)
-    mp5 = Stat(0, 0)
-    damage = Stat(0, 0)
-    attack_speed = Stat(0, 0)
-    armor = Stat(0, 0)
-    magic_resist = Stat(0, 0)
+class ChampionStats(object):
+    hp = ChampionStat(0, 0)
+    hp5 = ChampionStat(0, 0)
+    mana = ChampionStat(0, 0)
+    mp5 = ChampionStat(0, 0)
+    damage = ChampionStat(0, 0)
+    attack_speed = ChampionStat(0, 0)
+    armor = ChampionStat(0, 0)
+    magic_resist = ChampionStat(0, 0)
     range = 0
     speed = 0
 
@@ -44,7 +45,7 @@ class Stats(object):
     def _create_stat(inibin_map, key):
         """Read base and per_level values from inibin map."""
         stat = inibin_map['stats'][key]
-        return Stat(stat['base'], stat['per_level'])
+        return ChampionStat(stat['base'], stat['per_level'])
 
     def update_from_inibin(self, inibin_map):
         # TODO: Better error checking
@@ -81,7 +82,7 @@ class Champion(object):
 
     def __init__(self, internal_name):
         self.internal_name = internal_name
-        self.stats = Stats()
+        self.stats = ChampionStats()
         self.lore = Lore()
         self.ratings = Ratings()
         self.tips_as = []
@@ -170,11 +171,7 @@ def get_champions(provider):
         map(champion.add_tip_as, tips_as)
         map(champion.add_tip_against, tips_against)
 
-        # For convenience, champions should be accessible via ascii variable
-        # names; any groups of invalid characters will be replaced by _
-        alias = row.displayName.lower()
-        alias = re.sub('[^a-z0-9]+', '_', alias)
-        champion.alias = alias
+        champion.alias = alias(row.displayName)
 
         # Find champion inibin
         champ_name = champion.internal_name.lower()
