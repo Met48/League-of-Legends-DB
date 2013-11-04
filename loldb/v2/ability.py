@@ -49,6 +49,13 @@ class Ability(object):
     def __repr__(self):
         return '<Ability \'{}\'>'.format(self.name)
 
+    def get_tooltip_for_level(self, level):
+        level = self.levels[level]
+        tooltip = self.tooltip
+        for key, value in level.tooltip_values.items():
+            tooltip = tooltip.replace(key, str(value))
+        return tooltip
+
     @staticmethod
     def format_tooltip(tooltip):
         """Convert tooltip html to text."""
