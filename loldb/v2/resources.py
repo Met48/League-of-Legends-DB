@@ -84,12 +84,12 @@ class ResourceProvider(object):
             self.db = sqlite3.connect(self._get_db_path())
         return self.db
 
-    def get_db_rows(self, table):
-        """Get the rows from a gameStats database table."""
+    def get_db_query(self, query):
+        """Get the rows from a gameStats database query."""
         connection = self.get_db()
         cursor = connection.cursor()
         # execute doesn't accept a parametrized table name
-        rows = cursor.execute("SELECT * FROM `%s`" % table)
+        rows = cursor.execute(query)
 
         # Get column names from cursor
         columns = [c[0] for c in cursor.description]
@@ -98,6 +98,10 @@ class ResourceProvider(object):
         for row in rows:
             row = row_class(*row)
             yield row
+
+    def get_db_rows(self, table):
+        """Get the rows from a gameStats database table."""
+        return self.get_db_query("SELECT * FROM `%s`" % table)
 
     def get_raf_master(self):
         """Get RAFMaster instance for game client."""
