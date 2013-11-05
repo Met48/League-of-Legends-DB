@@ -19,13 +19,14 @@ import os
 import docopt
 
 from . import __version__
-from .provider import ResourceProvider
 from .champion import get_champions
-from .item import get_items
 from .converter import (
     format_champion,
     format_item,
 )
+from .correct import correct_champions
+from .item import get_items
+from .provider import ResourceProvider
 from .validate import validate_champions
 
 
@@ -46,6 +47,7 @@ def main(args):
         language=args['--lang']
     )
     champions = get_champions(provider)
+    correct_champions(champions)
     print('\n'.join(validate_champions(champions)))
     champions = map(format_champion, champions)
 
