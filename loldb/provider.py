@@ -56,7 +56,9 @@ def _build_path(
 
 
 class ResourceProvider(object):
-    def __init__(self, lol_path, language='en_US'):
+    def __init__(self, lol_path, language=None):
+        if language is None:
+            language = 'en_US'
         self.base_path = lol_path
         self.language = language
         self.db = None
