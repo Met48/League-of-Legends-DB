@@ -1,4 +1,12 @@
 class Skin(object):
+    id = -1
+    name = ''
+    portrait_path = ''
+    splash_path = ''
+    is_base = False
+    champion_id = -1
+    rank = -1
+
     def __init__(self, internal_name):
         self.internal_name = internal_name
 
