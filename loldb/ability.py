@@ -90,7 +90,7 @@ class Ability(object):
 
         """
         is_ult = key == 3
-        levels = cls.LEVELS[:4 if is_ult else 5]  # 6]
+        levels = cls.LEVELS[:3 if is_ult else 5]  # 6]
 
         ability = cls()
 
