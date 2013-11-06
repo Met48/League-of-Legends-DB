@@ -1,4 +1,5 @@
 import collections
+import warnings
 
 
 def correct_champions(champions):
@@ -30,13 +31,9 @@ def correct_ability(ability):
     correction = ABILITY_CORRECTIONS.get(ability.name, None)
     if correction is not None:
         for key, value in correction.items():
-            if key == 'levels':
-                # Corrections to individual levels
-                # TODO: Refactor
-                for level in value:
-                    for i, (key, value) in enumerate(level.items()):
-                        apply_correction(key, value, ability.levels[i])
-            else:
-                # Apply to all levels
-                for level in ability.levels:
-                    apply_correction(key, value, level)
+            if key not in ability.tooltip:
+                warnings.warn('Ability %s has unused correction %s.' %
+                              (ability, key))
+            # Apply to all levels
+            for level in ability.levels:
+                apply_correction(key, value, level)
