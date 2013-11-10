@@ -1,3 +1,5 @@
+import json
+
 def format_item(item):
     """
 
@@ -144,3 +146,26 @@ def format_skin(skin):
         'champion_id': skin.champion_id,
         'rank': skin.rank,
     }
+
+
+class Encoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, set):
+            return list(o)
+        return super(Encoder, self).default(o)
+
+
+def to_json(champions, items, **kwargs):
+    """Convert formatted champions and items to json."""
+    return json.dumps({
+        'champions': champions,
+        'items': items,
+    }, cls=Encoder, **kwargs)
+
+
+def to_yaml(champions, items):
+    import yaml
+    yaml.safe_dump({
+        'champions': champions,
+        'items': items,
+    })
