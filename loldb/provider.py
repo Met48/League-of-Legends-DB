@@ -1,5 +1,6 @@
 import collections
 import os
+import platform
 import re
 import sqlite3
 
@@ -56,7 +57,9 @@ def _build_path(
 
 
 class ResourceProvider(object):
-    def __init__(self, lol_path, language=None):
+    def __init__(self, lol_path=None, language=None):
+        if lol_path is None:
+            lol_path = self._get_default_path()
         if language is None:
             language = 'en_US'
         self.base_path = lol_path
@@ -65,13 +68,11 @@ class ResourceProvider(object):
         self.raf = None
         self.font_config = None
 
+    def _get_default_path(self):
+        raise NotImplementedError()
+
     def _get_db_path(self):
-        return os.path.join(
-            _build_path(self.base_path),
-            # TODO: Is /bin used on Windows?
-            'deploy/bin/assets/data/gameStats',
-            'gameStats_%s.sqlite' % self.language,
-        )
+        raise NotImplementedError()
 
     def _get_raf_path(self):
         return _build_path(
@@ -125,11 +126,41 @@ class ResourceProvider(object):
 
 
 class MacResourceProvider(ResourceProvider):
-    def __init__(self, lol_path=None, **kwargs):
-        if lol_path is None:
-            lol_path = "/Applications/League of Legends.app/Contents/LOL"
-        super(MacResourceProvider, self).__init__(lol_path, **kwargs)
+    def _get_default_path(self):
+        return '/Applications/League of Legends.app/Contents/LOL'
+
+    def _get_db_path(self):
+        return os.path.join(
+            _build_path(self.base_path),
+            'deploy/bin/assets/data/gameStats',
+            'gameStats_%s.sqlite' % self.language,
+        )
 
 
 class WindowsResourceProvider(ResourceProvider):
-    pass
+    def _get_default_path(self):
+        return 'C:/Riot Games/League of Legends/'
+
+    def _get_db_path(self):
+        return os.path.join(
+            _build_path(self.base_path),
+            'deploy/assets/data/gameStats',
+            'gameStats_%s.sqlite' % self.language,
+        )
+
+
+def get_provider_class(system=None):
+    if system is None:
+        system = platform.system()
+        if system == 'Windows':
+            system = 'win'
+        elif system == 'Darwin':
+            system = 'mac'
+        else:
+            system = None
+    if system == 'win':
+        return WindowsResourceProvider
+    elif system == 'mac':
+        return MacResourceProvider
+    else:
+        raise RuntimeError('Unable to determine operating system.')

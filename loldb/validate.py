@@ -10,6 +10,9 @@ def validate_champions(champions):
 
     :type champions: [champion.Champion]
     """
+    if not champions:
+        yield 'No champions!'
+
     def validate_attribute(champion, attribute_name):
         if not getattr(champion, attribute_name):
             yield 'Missing %s for champion %s.' % (

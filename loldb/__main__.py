@@ -1,24 +1,27 @@
 """
 Usage:
-  loldb stats --path=<path> [options]
+  loldb stats [options]
   loldb --help
   loldb --version
 
 Options:
-  -p, --path=<path>      Location of LoL installation.
-  -j, --json=<path>      Location to write json representation to.
-  -y, --yaml=<path>      Location to write yaml representation to.
+  -p, --path=<path>     Location of LoL installation.
+  -o, --os=<system>     Operating system. Either 'mac' or 'win', if absent
+                        attempts to auto-detect.
 
-  -f, --force            Continue automatically on warnings.
-  -n, --no               Abort automatically on warnings.
+  -j, --json=<path>     Location to write json representation to.
+  -y, --yaml=<path>     Location to write yaml representation to.
 
-  --skip-corrections     Debug option, does not correct champions.
-  --skip-validation      Debug option, does not validate output.
+  -f, --force           Continue automatically on warnings.
+  -n, --no              Abort automatically on warnings.
 
-  --lang=<language>      Language to output [default: en_US].
+  --skip-corrections    Debug option, does not correct champions.
+  --skip-validation     Debug option, does not validate output.
 
-  -h, --help             Display this message.
-  --version              Display version number.
+  --lang=<language>     Language to output [default: en_US].
+
+  -h, --help            Display this message.
+  --version             Display version number.
 
 """
 import os
@@ -36,7 +39,7 @@ from .convert import (
 )
 from .correct import correct_champions
 from .item import get_items
-from .provider import ResourceProvider
+from .provider import get_provider_class
 from .validate import validate_champions
 
 
@@ -48,8 +51,21 @@ def main(args):
     if not args['stats']:
         return
 
-    # Validate input path
+    system = args['--os']
+    ResourceProviderCls = get_provider_class(system)
+
     path = args['--path']
+
+    provider = ResourceProviderCls(
+        lol_path=path,
+        language=args['--lang']
+    )
+
+    if path is None:
+        path = provider.base_path
+        print('Defaulting to base path "%s"' % path)
+
+    # Validate path
     if not os.path.isdir(path):
         print('Invalid directory "%s"' % path)
         exit(1)
@@ -58,13 +74,9 @@ def main(args):
         exit(1)
 
     if not args['--json'] and not args['--yaml']:
-        ask_about_warning('No output format specified, continue?', args)
+        ask_about_warning('No output files specified, continue?', args)
 
-    provider = ResourceProvider(
-        lol_path=path,
-        language=args['--lang']
-    )
-    champions = get_champions(provider)
+    champions = list(get_champions(provider))
 
     if not args['--skip-corrections']:
         correct_champions(champions)
@@ -86,12 +98,14 @@ def main(args):
         prepare_write_path(json_path)
         with open(json_path, 'w') as f:
             f.write(to_json(champions, items))
+        print('Wrote json to "%s"' % json_path)
 
     yaml_path = args['--yaml']
     if yaml_path:
         prepare_write_path(yaml_path)
         with open(yaml_path, 'w') as f:
             f.write(to_yaml(champions, items))
+        print('Wrote yaml to "%s"' % yaml_path)
 
 
 def ask_about_warning(warning, args):
@@ -131,6 +145,8 @@ def prepare_write_path(path):
     May raise an exception as it ignores potential race conditions.
     """
     directory = os.path.dirname(path)
+    if not directory:
+        return
     if not os.path.exists(directory):
         os.makedirs(directory)
 

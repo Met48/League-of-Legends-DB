@@ -165,7 +165,7 @@ def to_json(champions, items, **kwargs):
 
 def to_yaml(champions, items):
     import yaml
-    yaml.safe_dump({
+    return yaml.safe_dump({
         'champions': champions,
         'items': items,
     })
