@@ -10,6 +10,9 @@ class Skin(object):
     def __init__(self, internal_name):
         self.internal_name = internal_name
 
+    def __lt__(self, other):
+        return self.rank < other.rank
+
     def __repr__(self):
         return "<Skin %s '%s'>" % (self.id, self.name)
 
