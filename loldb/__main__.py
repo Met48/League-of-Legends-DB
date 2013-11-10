@@ -20,7 +20,7 @@ import docopt
 
 from . import __version__
 from .champion import get_champions
-from .converter import (
+from .convert import (
     format_champion,
     format_item,
 )
