@@ -102,7 +102,7 @@ class Ability(object):
 
         # Extract tooltip text
         ability.name = inibin['name']
-        ability.internal_name = inibin['internal_name']
+        ability.internal_name = inibin['internalName']
         ability.description = inibin['desc']
         ability.key = cls.KEYS[key]
         ability.tooltip = tooltip = Ability.format_tooltip(inibin['tooltip'])
