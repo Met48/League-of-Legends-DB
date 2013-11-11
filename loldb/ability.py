@@ -37,9 +37,13 @@ class AbilityLevel(object):
 
 class Ability(object):
     name = ''
+    internal_name = ''
     description = ''
     key = ''
     tooltip = ''
+    icon_path = ''
+
+    _inibin = None
 
     levels = []
 
@@ -94,11 +98,15 @@ class Ability(object):
 
         ability = cls()
 
+        ability._inibin = inibin
+
         # Extract tooltip text
         ability.name = inibin['name']
+        ability.internal_name = inibin['internal_name']
         ability.description = inibin['desc']
         ability.key = cls.KEYS[key]
         ability.tooltip = tooltip = Ability.format_tooltip(inibin['tooltip'])
+        ability.icon_path = inibin['img']
 
         # Extract effect amounts for all levels
         effect_amounts = []

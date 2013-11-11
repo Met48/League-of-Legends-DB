@@ -135,6 +135,8 @@ class Champion(object):
     icon_path = ''
     select_sound_path = ''
 
+    _inibin = None
+
     def __init__(self, internal_name):
         self.internal_name = internal_name
         self.stats = ChampionStats()
@@ -218,6 +220,7 @@ def _update_raw_champion_with_provider(champion, provider):
     # Format as champion inibin
     font_config = provider.get_font_config()
     champ_inibin = champ_inibin.as_champion(font_config)
+    champion._inibin = champ_inibin
 
     # Read stats
     champion.stats.update_from_inibin(champ_inibin)
