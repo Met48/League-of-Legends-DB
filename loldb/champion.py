@@ -226,16 +226,28 @@ def _update_raw_champion_with_provider(champion, provider):
     champion.stats.update_from_inibin(champ_inibin)
 
     # Find abilities
+    _update_champion_passive(champion, champ_inibin)
     _update_champion_abilities(provider, champion, champ_inibin['abilities'])
 
     # Find skins
     _update_champion_skins(provider, champion)
 
 
+def _update_champion_passive(champion, inibin):
+    # Passive
+    passive = Ability()
+    passive.name = passive.internal_name = inibin['passive']
+    passive.description = passive.tooltip = inibin['passive_desc']
+    passive.icon_path = inibin['passive_icon']
+
+    champion.abilities.append(passive)
+
+
 _ABILITY_KEYS = list('skill%d' % i for i in range(1, 5))
 
 
 def _update_champion_abilities(provider, champion, abilities):
+    # Skills
     abilities = [abilities[key] for key in _ABILITY_KEYS]
     for i, ability_name in enumerate(abilities):
         # Find inibin for ability
